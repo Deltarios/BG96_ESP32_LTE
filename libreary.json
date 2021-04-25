@@ -1,0 +1,26 @@
+{
+    "name": "BG96_ESP32_LTE",
+    "version": "1.0.4",
+    "description": "A \"BG96\" program for compatibility with ESP32 for connect to LTE cellular net.",
+    "keywords": "BG96, ESP32, ARDUINO",
+    "repository": {
+      "type": "git",
+      "url": ""
+    },
+    "authors": [
+      {
+        "name": "Ariel Rios",
+        "email": "ariel.rios@avienergy.mx",
+        "maintainer": true
+      },
+      {
+        "name": "David Cuy",
+        "url": "https://davidcuy.github.io/",
+        "email": "david.cuy@avienergy.mx"
+      }
+    ],
+    "license": "MIT",
+    "dependencies": {},
+    "frameworks": "arduino",
+    "platforms": "espressif32"
+  }
