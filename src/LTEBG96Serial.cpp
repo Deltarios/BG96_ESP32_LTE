@@ -1,6 +1,9 @@
 #include "LTEBG96Serial.h"
 
-LTEBG96Serial::LTEBG96Serial() {}
+LTEBG96Serial::LTEBG96Serial() 
+{
+    
+}
 
 LTEBG96Serial::~LTEBG96Serial()
 {
