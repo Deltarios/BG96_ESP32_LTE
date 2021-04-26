@@ -196,11 +196,11 @@ bool LTEBG96SSL::InitSSL(unsigned int ssl_index, char *ca_cert, char *client_cer
         e_str = "\r\nSSL ERROR: An error occurred while setting the ssl certificate.\r\n";
         strcpy(err_code, e_str);
     }else if (ca_cert != "" && client_cert == "" && client_key == ""){
-        while (!UploadFiles(ssl_ca_cert_name, ca_cert)){
+        while (!UploadFiles((char*)ssl_ca_cert_name, ca_cert)){
             if(returnErrorCode(f_err_code)){
                 if (f_err_code == 407){
                     start_time = millis();
-                    while (!DeleteFiles(ssl_ca_cert_name)){
+                    while (!DeleteFiles((char*)ssl_ca_cert_name)){
                         if(millis() - start_time >= 10*1000UL){
                             e_str = "\r\nSSL ERROR: The ssl ca cert file exists. An error occurred while deleting the original file during the re-upload process.\r\n";
                             strcpy(err_code, e_str);
@@ -209,13 +209,13 @@ bool LTEBG96SSL::InitSSL(unsigned int ssl_index, char *ca_cert, char *client_cer
                     }
                 }
             }else if(millis() - start_time >= 30*1000UL){
-                sprintf(e_str, "\r\nSSL ERROR: Error uploading file, error code: %d ,Please check the corresponding documentation for details.\r\n", f_err_code);
+                sprintf((char*)e_str, "\r\nSSL ERROR: Error uploading file, error code: %d ,Please check the corresponding documentation for details.\r\n", f_err_code);
                 strcpy(err_code, e_str);
                 return false;
             }
         }
         start_time = millis();
-        while (!SetSSLCertificate(ssl_index, ssl_ca_cert_name, "", "", false)){
+        while (!SetSSLCertificate(ssl_index, (char*)ssl_ca_cert_name, "", "", false)){
             if (millis() - start_time >= 30 * 1000UL){
                 e_str = "\r\nSSL ERROR: An error occurred while setting the ssl certificate.\r\n";
                 strcpy(err_code, e_str);
@@ -225,12 +225,12 @@ bool LTEBG96SSL::InitSSL(unsigned int ssl_index, char *ca_cert, char *client_cer
         e_str = "\r\nSSL OK: The ssl were successfully initialized.\r\n";
         strcpy(err_code, e_str);
         return true;
-    }else if (ca_cert != "" && client_cert != "" && client_key != ""){
-        while (!UploadFiles(ssl_ca_cert_name, ca_cert)){
+    }else if (strcmp(ca_cert, "") != 0 && strcmp(client_cert, "") != 0 && strcmp(client_key, "") != 0){
+        while (!UploadFiles((char*)ssl_ca_cert_name, ca_cert)){
             if(returnErrorCode(f_err_code)){
                 if (f_err_code == 407){
                     start_time = millis();
-                    while (!DeleteFiles(ssl_ca_cert_name)){
+                    while (!DeleteFiles((char*)ssl_ca_cert_name)){
                         if(millis() - start_time >= 10*1000UL){
                             e_str = "\r\nSSL ERROR: The ssl ca cert file exists. An error occurred while deleting the original file during the re-upload process.\r\n";
                             strcpy(err_code, e_str);
@@ -239,17 +239,17 @@ bool LTEBG96SSL::InitSSL(unsigned int ssl_index, char *ca_cert, char *client_cer
                     }
                 }
             }else if(millis() - start_time >= 30*1000UL){
-                sprintf(e_str, "\r\nSSL ERROR: Error uploading file, error code: %d ,Please check the corresponding documentation for details.\r\n", f_err_code);
+                sprintf((char*)e_str, "\r\nSSL ERROR: Error uploading file, error code: %d ,Please check the corresponding documentation for details.\r\n", f_err_code);
                 strcpy(err_code, e_str);
                 return false;
             }
         }
         start_time = millis();
-        while (!UploadFiles(ssl_client_cert_name, client_cert)){
+        while (!UploadFiles((char*)ssl_client_cert_name, client_cert)){
             if(returnErrorCode(f_err_code)){
                 if (f_err_code == 407){
                     start_time = millis();
-                    while (!DeleteFiles(ssl_client_cert_name)){
+                    while (!DeleteFiles((char*)ssl_client_cert_name)){
                         if(millis() - start_time >= 10*1000UL){
                             e_str = "\r\nSSL ERROR: The ssl ca cert file exists. An error occurred while deleting the original file during the re-upload process.\r\n";
                             strcpy(err_code, e_str);
@@ -258,17 +258,17 @@ bool LTEBG96SSL::InitSSL(unsigned int ssl_index, char *ca_cert, char *client_cer
                     }
                 }
             }else if(millis() - start_time >= 30*1000UL){
-                sprintf(e_str, "\r\nSSL ERROR: Error uploading file, error code: %d ,Please check the corresponding documentation for details.\r\n", f_err_code);
+                sprintf((char*)e_str, "\r\nSSL ERROR: Error uploading file, error code: %d ,Please check the corresponding documentation for details.\r\n", f_err_code);
                 strcpy(err_code, e_str);
                 return false;
             }
         }
         start_time = millis();
-        while (!UploadFiles(ssl_client_key_name, client_key)){
+        while (!UploadFiles((char*)ssl_client_key_name, client_key)){
             if(returnErrorCode(f_err_code)){
                 if (f_err_code == 407){
                     start_time = millis();
-                    while (!DeleteFiles(ssl_client_key_name)){
+                    while (!DeleteFiles((char*)ssl_client_key_name)){
                         if(millis() - start_time >= 10*1000UL){
                             e_str = "\r\nSSL ERROR: The ssl ca cert file exists. An error occurred while deleting the original file during the re-upload process.\r\n";
                             strcpy(err_code, e_str);
@@ -277,13 +277,13 @@ bool LTEBG96SSL::InitSSL(unsigned int ssl_index, char *ca_cert, char *client_cer
                     }
                 }
             }else if(millis() - start_time >= 30*1000UL){
-                sprintf(e_str, "\r\nSSL ERROR: Error uploading file, error code: %d ,Please check the corresponding documentation for details.\r\n", f_err_code);
+                sprintf((char*)e_str, "\r\nSSL ERROR: Error uploading file, error code: %d ,Please check the corresponding documentation for details.\r\n", f_err_code);
                 strcpy(err_code, e_str);
                 return false;
             }
         }
         start_time = millis();
-        while (!SetSSLCertificate(ssl_index, ssl_ca_cert_name, ssl_client_cert_name, ssl_client_key_name, false)){
+        while (!SetSSLCertificate(ssl_index, (char*)ssl_ca_cert_name, (char*)ssl_client_cert_name, (char*)ssl_client_key_name, false)){
             if (millis() - start_time >= 30 * 1000UL){
                 e_str = "\r\nSSL ERROR: An error occurred while setting the ssl certificate.\r\n";
                 strcpy(err_code, e_str);
@@ -409,5 +409,5 @@ SSL_Socket_Event_t LTEBG96SSL::WaitCheckSSLSocketEvent(char *event, unsigned int
             return SSL_SOCKET_RECV_EVENT;
         }
     }
-    return 0;
+    return SSL_Socket_Event_t(0);
 }

@@ -2,11 +2,11 @@
 
 #include <LTEBG96MQTT.h>
 
-#define DSerial Serial1
-#define ATSerial Serial
+#define DSerial Serial
+#define ATSerial Serial2
 
-char APN[] = "hologram";
-char mqtt_server[] = "iot-as-mqtt.cn-shanghai.aliyuncs.com";
+char APN[] = "modem.nexteldata.com.mx";
+char mqtt_server[] = "industrial.api.ubidots.com";
 unsigned int mqtt_port = 1883;
 char mqtt_client_id[] = "mqtt_test";
 unsigned int comm_pdp_index = 1;  // The range is 1 ~ 16
@@ -15,39 +15,39 @@ Mqtt_Version_t version = MQTT_V3;
 Mqtt_Qos_t mqtt_qos = AT_MOST_ONCE;
 char device_name[] = "AVI_TEST";
 
-WisLTEBG96MQTT WisLTE(ATSerial, DSerial);
+LTEBG96MQTT BG96LTE(ATSerial, DSerial);
 
 void setup()
 {
   DSerial.begin(115200);
   while (DSerial.read() >= 0);
-  DSerial.println("This is the WisLTE Debug Serial!");
+  DSerial.println("This is the BG96LTE Debug Serial!");
   delay(1000);
   ATSerial.begin(115200);
   while (ATSerial.read() >= 0);
   delay(1000);
-  while (!WisLTE.InitModule());
+  while (!BG96LTE.InitModule());
 
-  WisLTE.SetDevCommandEcho(false);
+  BG96LTE.SetDevCommandEcho(false);
 
   char inf[64];
-  if (WisLTE.GetDevInformation(inf))
+  if (BG96LTE.GetDevInformation(inf))
   {
     DSerial.println(inf);
   }
 
   char apn_error[64];
-  while (!WisLTE.InitAPN(comm_pdp_index, APN, "", "", apn_error))
+  while (!BG96LTE.InitAPN(comm_pdp_index, APN, "", "", apn_error))
   {
     DSerial.println(apn_error);
   }
   DSerial.println(apn_error);
 
-  while (!WisLTE.SetMQTTConfigureParameters(comm_mqtt_index, comm_pdp_index, version, 150, SERVER_STORE_SUBSCRIPTIONS))
+  while (!BG96LTE.SetMQTTConfigureParameters(comm_mqtt_index, comm_pdp_index, version, 150, SERVER_STORE_SUBSCRIPTIONS))
   {
     DSerial.println("\r\nConfig the MQTT Parameter Fail!");
     int e_code;
-    if (WisLTE.returnErrorCode(e_code))
+    if (BG96LTE.returnErrorCode(e_code))
     {
       DSerial.print("\r\nERROR CODE: ");
       DSerial.println(e_code);
@@ -57,11 +57,11 @@ void setup()
   }
   DSerial.println("\r\nConfig the MQTT Parameter Success!");
 
-  while (WisLTE.OpenMQTTNetwork(comm_mqtt_index, mqtt_server, mqtt_port) != 0)
+  while (BG96LTE.OpenMQTTNetwork(comm_mqtt_index, mqtt_server, mqtt_port) != 0)
   {
     DSerial.println("\r\nSet the MQTT Service Address Fail!");
     int e_code;
-    if (WisLTE.returnErrorCode(e_code))
+    if (BG96LTE.returnErrorCode(e_code))
     {
       DSerial.print("\r\nERROR CODE: ");
       DSerial.println(e_code);
@@ -71,11 +71,11 @@ void setup()
   }
   DSerial.println("\r\nSet the MQTT Service Address Success!");
 
-  while (WisLTE.CreateMQTTClient(comm_mqtt_index, mqtt_client_id, "", "") != 0)
+  while (BG96LTE.CreateMQTTClient(comm_mqtt_index, mqtt_client_id, "", "avi-energy") != 0)
   {
     DSerial.println("\r\nCreate a MQTT Client Fail!");
     int e_code;
-    if (WisLTE.returnErrorCode(e_code))
+    if (BG96LTE.returnErrorCode(e_code))
     {
       DSerial.print("\r\nERROR CODE: ");
       DSerial.println(e_code);
@@ -85,11 +85,11 @@ void setup()
   }
   DSerial.println("\r\nCreate a MQTT Client Success!");
 
-  while (WisLTE.MQTTSubscribeTopic(comm_mqtt_index, 1, "/a1mQBMY2HI9/D896E0FF00012940/update", mqtt_qos) != 0)
+  while (BG96LTE.MQTTSubscribeTopic(comm_mqtt_index, 1, "/a1mQBMY2HI9/D896E0FF00012940/update", mqtt_qos) != 0)
   {
     DSerial.println("\r\nMQTT Subscribe Topic Fail!");
     int e_code;
-    if (WisLTE.returnErrorCode(e_code))
+    if (BG96LTE.returnErrorCode(e_code))
     {
       DSerial.print("\r\nERROR CODE: ");
       DSerial.println(e_code);
@@ -102,35 +102,9 @@ void setup()
 
 void loop()
 {
-  char mqtt_recv[128];
-  char *sta_buf;
-  Mqtt_URC_Event_t ret = WisLTE.WaitCheckMQTTURCEvent(mqtt_recv, 2);
-  switch (ret)
-  {
-  case MQTT_RECV_DATA_EVENT:
-    *sta_buf = strstr(mqtt_recv, "\",\"");
-    DSerial.println("\r\nThe MQTT Recv Data");
-    DSerial.println(sta_buf + 3);
-    break;
-  case MQTT_STATUS_EVENT:
-    *sta_buf = strchr(mqtt_recv, ',');
-    if (atoi(sta_buf + 1) == 1)
-    {
-      if (WisLTE.CloseMQTTClient(comm_mqtt_index))
-      {
-        DSerial.println("\r\nClose the MQTT Client Success!");
-      }
-    }
-    else
-    {
-      DSerial.print("\r\nStatus cade is :");
-      DSerial.println(atoi(sta_buf + 1));
-      DSerial.println("Please check the documentation for error details.");
-    }
-    break;
+
+  if (BG96LTE.MQTTPublishMessages(comm_mqtt_index, 1, mqtt_qos, "/v1.6/devices/AVI_TEST", false, "{\"hello\":{\"value\":10}}") == 0){
+      DSerial.println("\r\nMQTT Publish Messages Success!");
+      delay(2500);
   }
-  // if (WisLTE.MQTTPublishMessages(comm_mqtt_index, 1, mqtt_qos, "/a1mQBMY2HI9/D896E0FF00012940/get", true, "1234") == 0){
-  //     DSerial.println("\r\nMQTT Publish Messages Success!");
-  //     delay(10000);
-  // }
 }

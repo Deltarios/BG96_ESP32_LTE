@@ -109,9 +109,9 @@ Mqtt_Network_Result_t LTEBG96MQTT::OpenMQTTNetwork(unsigned int mqtt_index, char
             }
         }
         char *sta_buf = searchChrBuffer(',');
-        return atoi(sta_buf + 1);
+        return Mqtt_Network_Result_t(atoi(sta_buf + 1));
     }
-    return -2;
+    return Mqtt_Network_Result_t(-2);
 }
 
 bool LTEBG96MQTT::CloseMQTTNetwork(unsigned int mqtt_index)
@@ -139,7 +139,7 @@ Mqtt_Client_Result_Status_t LTEBG96MQTT::CreateMQTTClient(unsigned int mqtt_inde
 {
     char cmd[128], buf[128];
     strcpy(cmd, MQTT_CREATE_CLIENT);
-    if (username != "" && password != ""){
+    if ( strcmp(username, "") != 0 && strcmp(password, "") != 0) {
         sprintf(buf, "=%d,\"%s\",\"%s\",\"%s\"", mqtt_index, client_id, username, password);
     } else {
         sprintf(buf, "=%d,\"%s\"", mqtt_index, client_id);
@@ -155,11 +155,13 @@ Mqtt_Client_Result_Status_t LTEBG96MQTT::CreateMQTTClient(unsigned int mqtt_inde
         char temp[16];
         char *sta_buf = searchChrBuffer(',');
         strcpy(temp, sta_buf + 1);
-        sta_buf = strchr(temp, ',');
-        *sta_buf = '\0';
-        return atoi(temp);
+        // sta_buf = strchr(temp, ',');
+        memset(sta_buf, '\0', sizeof(sta_buf));
+        // sta_buf = '\0';
+        Serial.println(atoi(temp));
+        return Mqtt_Client_Result_Status_t(atoi(temp));
     }
-    return -1;
+    return Mqtt_Client_Result_Status_t(-1);
 }
 
 bool LTEBG96MQTT::CloseMQTTClient(unsigned int mqtt_index)
@@ -206,9 +208,9 @@ Mqtt_Client_Result_Status_t LTEBG96MQTT::MQTTSubscribeTopic(unsigned int mqtt_in
             p[i] = strtok(NULL,",");
         }
         p[i] = '\0';
-        return atoi(p[1]);
+        return Mqtt_Client_Result_Status_t(atoi(p[1]));
     }
-    return -1;
+    return Mqtt_Client_Result_Status_t(-1);
 }
 
 Mqtt_Client_Result_Status_t LTEBG96MQTT::MQTTUnsubscribeTopic(unsigned int mqtt_index, unsigned int msg_id, char *topic)
@@ -229,15 +231,16 @@ Mqtt_Client_Result_Status_t LTEBG96MQTT::MQTTUnsubscribeTopic(unsigned int mqtt_
         strcpy(temp, sta_buf + 1);
         sta_buf = strchr(temp, ',');
         *sta_buf = '\0';
-        return atoi(temp);
+        return Mqtt_Client_Result_Status_t(atoi(temp));
     }
-    return -1;
+    return Mqtt_Client_Result_Status_t(-1);
 }
 
 Mqtt_Client_Result_Status_t LTEBG96MQTT::MQTTPublishMessages(unsigned int mqtt_index, unsigned int msg_id, Mqtt_Qos_t qos, char *topic, bool retain, char *publish_data)
 {
     char cmd[64], buf[64];
     strcpy(cmd, MQTT_PUBLISH_MESSAGES);
+    Serial.println(publish_data);
     if(retain){
         sprintf(buf, "=%d,%d,%d,1,\"%s\"", mqtt_index, msg_id, qos, topic);
     } else {
@@ -246,7 +249,8 @@ Mqtt_Client_Result_Status_t LTEBG96MQTT::MQTTPublishMessages(unsigned int mqtt_i
     strcat(cmd, buf);
     if (sendAndSearchChr(cmd, '>', 2)){
         char ctrl_z = 0x1A;
-        strcat(publish_data, ctrl_z);
+        strcat(publish_data, &ctrl_z);
+        Serial.println(publish_data);
         if (sendDataAndCheck(publish_data, MQTT_PUBLISH_MESSAGES, RESPONSE_ERROR, 150)){
             unsigned long start_time = millis();
             while(millis() - start_time < 500UL){
@@ -254,16 +258,18 @@ Mqtt_Client_Result_Status_t LTEBG96MQTT::MQTTPublishMessages(unsigned int mqtt_i
                     readResponseByteToBuffer();
                 }
             }
+            Serial.println(publish_data);
             memset(publish_data, '\0', strlen(publish_data));
             char temp[16];
             char *sta_buf = searchChrBuffer(',');
             strcpy(temp, sta_buf + 1);
-            sta_buf = strchr(temp, ',');
-            *sta_buf = '\0';
-            return atoi(temp);
+            // sta_buf = strchr(temp, ',');
+            memset(sta_buf, '\0', sizeof(sta_buf));
+            // *sta_buf = '\0';
+            return Mqtt_Client_Result_Status_t(atoi(temp));
         }
     }
-    return -1;
+    return Mqtt_Client_Result_Status_t(-1);
 }
 
 Mqtt_URC_Event_t LTEBG96MQTT::WaitCheckMQTTURCEvent(char *event, unsigned int timeout)
@@ -284,5 +290,5 @@ Mqtt_URC_Event_t LTEBG96MQTT::WaitCheckMQTTURCEvent(char *event, unsigned int ti
         strcpy(event, sta_buf + 2);
         return MQTT_STATUS_EVENT;
     }
-    return -1;
+    return Mqtt_URC_Event_t(-1);
 }

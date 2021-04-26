@@ -79,6 +79,20 @@ const char DNS_FUNCTION[] = "+QIDNSGIP";
 const char QUERY_ERROR_CODE[] = "+QIGETERROR";
 const char RECV_SOCKET_EVENT[] = "+QIURC";
 
+// FILE AT Commands
+const char FILE_SPACE_INFORMATION[] = "+QFLDS";
+const char FILE_LIST_FILES[] = "+QFLST";
+const char FILE_DELETE_FILES[] = "+QFDEL";
+const char FILE_UPLOAD_FILES[] = "+QFUPL";
+const char FILE_DOWNLOAD_FILE[] = "+QFDWL";
+const char FILE_OPEN_FILE[] = "+QFOPEN";
+const char FILE_READ_FILE[] = "+QFREAD";
+const char FILE_WRITE_FILE[] = "+QFWRITE";
+const char FILE_SET_POSITION_FILE[] = "+QFSEEK";
+const char FILE_GET_POSITION_FILE[] = "+QFPOSITION";
+const char FILE_TRUNCATE_FILE[] = "+QFTUCAT";
+const char FILE_CLOSE_FILE[] = "+QFCLOSE";
+
 // SSL AT Commands
 const char SSL_CONFIG_PARAMETER[] = "+QSSLCFG";
 const char SSL_OPEN_SOCKET[] = "+QSSLOPEN";

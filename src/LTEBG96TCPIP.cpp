@@ -384,5 +384,5 @@ Socket_Event_t LTEBG96TCPIP::WaitCheckSocketEvent(char *event, unsigned int time
             return SOCKET_PDP_DEACTIVATION_EVENT;
         }
     }
-    return 0;
+    return Socket_Event_t(0);
 }

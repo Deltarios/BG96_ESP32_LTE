@@ -17,7 +17,7 @@ LTEBG96Common::LTEBG96Common(Stream &atserial, Stream &dserial) : LTEBG96Serial(
 
 bool LTEBG96Common::InitModule()
 {
-#ifdef WISLTE_BOARD
+#ifdef LTE_BOARD
     pinMode(POWKEY_PIN, OUTPUT);
     delay(100);
     digitalWrite(POWKEY_PIN, LOW);
@@ -38,7 +38,7 @@ bool LTEBG96Common::InitModule()
         }
     }
 #endif
-#ifdef WISCELLULAR_BOARD
+#ifdef CELLULAR_BOARD
     pinMode(RESET_PIN, OUTPUT);
     digitalWrite(RESET_PIN, LOW);
     pinMode(POWKEY_PIN, OUTPUT);
