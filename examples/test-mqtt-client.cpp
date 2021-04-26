@@ -103,7 +103,7 @@ void setup()
 void loop()
 {
 
-  if (BG96LTE.MQTTPublishMessages(comm_mqtt_index, 1, mqtt_qos, "/v1.6/devices/AVI_TEST", false, "{\"hello\":{\"value\":10}}") == 0){
+  if (BG96LTE.MQTTPublishMessages(comm_mqtt_index, 0, mqtt_qos, "/v1.6/devices/avi-device", false, "{\"hello\":{\"value\":10}}") == 0){
       DSerial.println("\r\nMQTT Publish Messages Success!");
       delay(2500);
   }

@@ -98,7 +98,7 @@ class LTEBG96MQTT : public LTEBG96SSL
 
     Mqtt_Client_Result_Status_t MQTTUnsubscribeTopic(unsigned int mqtt_index, unsigned int msg_id, char *topic);
 
-    Mqtt_Client_Result_Status_t MQTTPublishMessages(unsigned int mqtt_index, unsigned int msg_id, Mqtt_Qos_t qos, char *topic, bool retain, char *publish_data);
+    Mqtt_Client_Result_Status_t MQTTPublishMessages(unsigned int mqtt_index, unsigned int msg_id, Mqtt_Qos_t qos, char *topic, bool retain, String publish_data);
 
     Mqtt_URC_Event_t WaitCheckMQTTURCEvent(char *event, unsigned int timeout);
 
