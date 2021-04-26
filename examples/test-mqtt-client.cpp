@@ -17,6 +17,11 @@ char device_name[] = "AVI_TEST";
 
 LTEBG96MQTT BG96LTE(ATSerial, DSerial);
 
+unsigned long lastMillis = 0;
+
+void sendData();
+int getData();
+
 void setup()
 {
   DSerial.begin(115200);
@@ -85,7 +90,7 @@ void setup()
   }
   DSerial.println("\r\nCreate a MQTT Client Success!");
 
-  while (BG96LTE.MQTTSubscribeTopic(comm_mqtt_index, 1, "/a1mQBMY2HI9/D896E0FF00012940/update", mqtt_qos) != 0)
+  while (BG96LTE.MQTTSubscribeTopic(comm_mqtt_index, 0, "/v1.6/devices/avi-device/hello/lv", mqtt_qos) != 0)
   {
     DSerial.println("\r\nMQTT Subscribe Topic Fail!");
     int e_code;
@@ -96,15 +101,58 @@ void setup()
       DSerial.println("Please check the documentation for error details.");
       while (1);
     }
+    delay(5000);
   }
   DSerial.println("\r\nMQTT Subscribe Topic Success!");
 }
 
 void loop()
 {
-
-  if (BG96LTE.MQTTPublishMessages(comm_mqtt_index, 0, mqtt_qos, "/v1.6/devices/avi-device", false, "{\"hello\":{\"value\":10}}") == 0){
-      DSerial.println("\r\nMQTT Publish Messages Success!");
-      delay(2500);
+  getData();
+  if (millis() - lastMillis > 5000)
+  {
+    Serial.println("Sending payload");
+    sendData();
+    lastMillis = millis();
   }
+}
+
+void sendData() 
+{
+  if (BG96LTE.MQTTPublishMessages(comm_mqtt_index, 0, mqtt_qos, "/v1.6/devices/avi-device", false, "{\"hello2\":{\"value\":10}}") == 0)
+  {
+    DSerial.println("\r\nMQTT Publish Messages Success!");
+  }
+}
+
+int getData()
+{
+  char mqtt_recv[128];
+  char *sta_buf;
+  Mqtt_URC_Event_t ret = BG96LTE.WaitCheckMQTTURCEvent(mqtt_recv, 2);
+  switch (ret)
+  {
+  case MQTT_RECV_DATA_EVENT:
+    sta_buf = strstr(mqtt_recv, "\",\"");
+    DSerial.println("\r\nThe MQTT Recv Data");
+    DSerial.println(sta_buf + 3);
+    break;
+  case MQTT_STATUS_EVENT:
+    sta_buf = strchr(mqtt_recv, ',');
+    if (atoi(sta_buf + 1) == 1)
+    {
+      if (BG96LTE.CloseMQTTClient(comm_mqtt_index))
+      {
+        DSerial.println("\r\nClose the MQTT Client Success!");
+      }
+    }
+    else
+    {
+      DSerial.print("\r\nStatus cade is :");
+      DSerial.println(atoi(sta_buf + 1));
+      DSerial.println("Please check the documentation for error details.");
+    }
+    break;
+  }
+  return 1;
 }

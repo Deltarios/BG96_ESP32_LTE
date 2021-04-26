@@ -205,9 +205,9 @@ Mqtt_Client_Result_Status_t LTEBG96MQTT::MQTTSubscribeTopic(unsigned int mqtt_in
             p[i] = strtok(NULL,",");
         }
         p[i] = '\0';
-        return Mqtt_Client_Result_Status_t(atoi(p[1]));
+        return (Mqtt_Client_Result_Status_t)atoi(p[1]);
     }
-    return Mqtt_Client_Result_Status_t(-1);
+    return (Mqtt_Client_Result_Status_t)-1;
 }
 
 Mqtt_Client_Result_Status_t LTEBG96MQTT::MQTTUnsubscribeTopic(unsigned int mqtt_index, unsigned int msg_id, char *topic)
