@@ -87,22 +87,22 @@ bool LTEBG96SSL::SetSSLParameters(unsigned int ssl_index, SSL_Version_t s_versio
 
 bool LTEBG96SSL::SetSSLCertificate(unsigned int ssl_index, char *ca_cert_path, char *client_cert_path, char *client_key_path, bool validity_check)
 {
-    char cmd[64],buf[32];
+    char cmd[64],buf[64];
     strcpy(cmd, SSL_CONFIG_PARAMETER);
-    if(ca_cert_path == "" && client_cert_path == "" && client_key_path == ""){
+    if(strcmp(ca_cert_path, "") == 0 && strcmp(client_cert_path, "") == 0 && strcmp(client_key_path, "") == 0){
         sprintf(buf, "=\"seclevel\",%d,0", ssl_index);
         strcat(cmd, buf);
         if(sendAndSearch(cmd, RESPONSE_OK, RESPONSE_ERROR, 5)){
             return true;
         }
-    }else if(ca_cert_path != "" && client_cert_path == "" && client_key_path == ""){
+    }else if(strcmp(ca_cert_path, "") != 0 && strcmp(client_cert_path, "") == 0 && strcmp(client_key_path, "") == 0){
         sprintf(buf, "=\"seclevel\",%d,1", ssl_index);
         strcat(cmd, buf);
         if(!sendAndSearch(cmd, RESPONSE_OK, RESPONSE_ERROR, 5)){
             return false;
         }
         memset(cmd, '\0', 64);
-        memset(buf, '\0', 32);
+        memset(buf, '\0', 64);
         strcpy(cmd, SSL_CONFIG_PARAMETER);
         sprintf(buf, "=\"cacert\",%d,\"%s\"", ssl_index, ca_cert_path);
         strcat(cmd, buf);
@@ -110,7 +110,7 @@ bool LTEBG96SSL::SetSSLCertificate(unsigned int ssl_index, char *ca_cert_path, c
             return false;
         }
         memset(cmd, '\0', 64);
-        memset(buf, '\0', 32);
+        memset(buf, '\0', 64);
         strcpy(cmd, SSL_CONFIG_PARAMETER);
         if(validity_check){
             sprintf(buf, "=\"ignorelocaltime\",%d,1", ssl_index);
@@ -126,14 +126,14 @@ bool LTEBG96SSL::SetSSLCertificate(unsigned int ssl_index, char *ca_cert_path, c
             }
         }
             
-    }else if(ca_cert_path != "" && client_cert_path != "" && client_key_path != ""){
+    }else if(strcmp(ca_cert_path, "") != 0 && strcmp(client_cert_path, "") != 0 && strcmp(client_key_path, "") != 0){
         sprintf(buf, "=\"seclevel\",%d,2", ssl_index);
         strcat(cmd, buf);
         if(!sendAndSearch(cmd, RESPONSE_OK, RESPONSE_ERROR, 5)){
             return false;
         }
         memset(cmd, '\0', 64);
-        memset(buf, '\0', 32);
+        memset(buf, '\0', 64);
         strcpy(cmd, SSL_CONFIG_PARAMETER);
         sprintf(buf, "=\"cacert\",%d,\"%s\"", ssl_index, ca_cert_path);
         strcat(cmd, buf);
@@ -141,15 +141,17 @@ bool LTEBG96SSL::SetSSLCertificate(unsigned int ssl_index, char *ca_cert_path, c
             return false;
         }
         memset(cmd, '\0', 64);
-        memset(buf, '\0', 32);
+        memset(buf, '\0', 64);
         strcpy(cmd, SSL_CONFIG_PARAMETER);
         sprintf(buf, "=\"clientcert\",%d,\"%s\"", ssl_index, client_cert_path);
+        Serial.println(buf);
+        Serial.println(cmd);
         strcat(cmd, buf);
         if(!sendAndSearch(cmd, RESPONSE_OK, RESPONSE_ERROR, 5)){
             return false;
         }
         memset(cmd, '\0', 64);
-        memset(buf, '\0', 32);
+        memset(buf, '\0', 64);
         strcpy(cmd, SSL_CONFIG_PARAMETER);
         sprintf(buf, "=\"clientkey\",%d,\"%s\"", ssl_index, client_key_path);
         strcat(cmd, buf);
@@ -157,7 +159,7 @@ bool LTEBG96SSL::SetSSLCertificate(unsigned int ssl_index, char *ca_cert_path, c
             return false;
         }
         memset(cmd, '\0', 64);
-        memset(buf, '\0', 32);
+        memset(buf, '\0', 64);
         strcpy(cmd, SSL_CONFIG_PARAMETER);
         if(validity_check){
             sprintf(buf, "=\"ignorelocaltime\",%d,1", ssl_index);
@@ -186,8 +188,8 @@ bool LTEBG96SSL::InitSSL(unsigned int ssl_index, char *ca_cert, char *client_cer
         strcpy(err_code, e_str);
         return false;
     }
-
-    if (ca_cert == "" && client_cert == "" && client_key == ""){
+    
+    if (strcmp(ca_cert, "") == 0 && strcmp(client_cert, "") == 0 && strcmp(client_key, "") == 0){
         if (SetSSLCertificate(ssl_index, "", "", "", false)){
             e_str = "\r\nSSL OK: The ssl were successfully initialized.\r\n";
             strcpy(err_code, e_str);
@@ -409,5 +411,5 @@ SSL_Socket_Event_t LTEBG96SSL::WaitCheckSSLSocketEvent(char *event, unsigned int
             return SSL_SOCKET_RECV_EVENT;
         }
     }
-    return SSL_Socket_Event_t(0);
+    return (SSL_Socket_Event_t)0;
 }
