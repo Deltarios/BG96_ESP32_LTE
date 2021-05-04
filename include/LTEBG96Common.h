@@ -36,8 +36,8 @@
 #define POWKEY_PIN  2
 #endif
 #ifdef  CELLULAR_BOARD
-#define POWKEY_PIN  27
-#define RESET_PIN   26
+#define POWKEY_PIN  21
+#define RESET_PIN   22
 #endif
 
 typedef enum functionality{
